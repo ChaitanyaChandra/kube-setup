@@ -48,7 +48,3 @@ variable "machine_type" {
   type    = string
   default = "t3.xlarge"
 }
-
-variable "TFC_AWS_SECRET_ACCESS_KEY" {
-  sensitive = true
-}
