@@ -1,7 +1,7 @@
 resource "aws_eks_cluster" "primary" {
-  name            = "${local.tags.Service}-${local.Environment}-${var.cluster_name}-${local.region}-${local.env_tag.appenv}"
-  role_arn        = aws_iam_role.control_plane.arn
-  version         = var.k8s_version
+  name     = "${local.tags.Service}-${local.Environment}-${var.cluster_name}-${local.region}-${local.env_tag.appenv}"
+  role_arn = aws_iam_role.control_plane.arn
+  version  = var.k8s_version
 
   vpc_config {
     security_group_ids = [aws_security_group.worker.id]
@@ -16,7 +16,7 @@ resource "aws_eks_cluster" "primary" {
 }
 
 resource "aws_iam_role" "control_plane" {
-  name = "${local.tags.Service}-${local.Environment}-eks-role"
+  name               = "${local.tags.Service}-${local.Environment}-eks-role"
   assume_role_policy = <<POLICY
 {
   "Version": "2012-10-17",
@@ -31,7 +31,7 @@ resource "aws_iam_role" "control_plane" {
   ]
 }
 POLICY
-  tags = local.tags
+  tags               = local.tags
 }
 
 resource "aws_iam_role_policy_attachment" "cluster" {
@@ -46,7 +46,7 @@ resource "aws_iam_role_policy_attachment" "service" {
 
 resource "aws_vpc" "worker" {
   cidr_block = "10.0.0.0/16"
-  tags = local.tags
+  tags       = local.tags
 }
 
 resource "aws_security_group" "worker" {
@@ -72,5 +72,5 @@ resource "aws_subnet" "worker" {
   cidr_block              = "10.0.${count.index}.0/24"
   vpc_id                  = aws_vpc.worker.id
   map_public_ip_on_launch = true
-  tags = local.tags
+  tags                    = local.tags
 }

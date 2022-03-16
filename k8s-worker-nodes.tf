@@ -55,7 +55,7 @@ resource "aws_iam_role_policy_attachment" "registry" {
 
 resource "aws_internet_gateway" "worker" {
   vpc_id = aws_vpc.worker.id
-  tags = local.tags
+  tags   = local.tags
 }
 
 resource "aws_route_table" "worker" {
@@ -68,7 +68,7 @@ resource "aws_route_table" "worker" {
 }
 
 resource "aws_route_table_association" "worker" {
-  count = 3
+  count          = 3
   subnet_id      = aws_subnet.worker[count.index].id
   route_table_id = aws_route_table.worker.id
 }
