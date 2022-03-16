@@ -49,6 +49,6 @@ variable "machine_type" {
   default = "t3.xlarge"
 }
 
-variable "AWS_SECRET_ACCESS_KEY" {
+variable "TFC_AWS_SECRET_ACCESS_KEY" {
   sensitive = true
 }
