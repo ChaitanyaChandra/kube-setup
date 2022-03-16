@@ -1,5 +1,5 @@
 resource "aws_eks_cluster" "primary" {
-  name            = var.cluster_name
+  name            = "${local.tags.Service}-${local.Environment}-${var.cluster_name}-${local.region}-${local.env_tag.appenv}"
   role_arn        = aws_iam_role.control_plane.arn
   version         = var.k8s_version
 
@@ -12,10 +12,11 @@ resource "aws_eks_cluster" "primary" {
     aws_iam_role_policy_attachment.cluster,
     aws_iam_role_policy_attachment.service,
   ]
+  tags = local.tags
 }
 
 resource "aws_iam_role" "control_plane" {
-  name = "devops-catalog-control-plane"
+  name = "${local.tags.Service}-${local.Environment}-eks-role"
   assume_role_policy = <<POLICY
 {
   "Version": "2012-10-17",
@@ -30,6 +31,7 @@ resource "aws_iam_role" "control_plane" {
   ]
 }
 POLICY
+  tags = local.tags
 }
 
 resource "aws_iam_role_policy_attachment" "cluster" {
@@ -44,14 +46,11 @@ resource "aws_iam_role_policy_attachment" "service" {
 
 resource "aws_vpc" "worker" {
   cidr_block = "10.0.0.0/16"
-  tags = {
-    "Name"                                      = "devops-catalog"
-    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
-  }
+  tags = local.tags
 }
 
 resource "aws_security_group" "worker" {
-  name        = "devops-catalog"
+  name        = "${local.tags.Service}-${local.Environment}-eks-worker-sg"
   description = "Cluster communication with worker nodes"
   vpc_id      = aws_vpc.worker.id
   egress {
@@ -60,9 +59,7 @@ resource "aws_security_group" "worker" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  tags = {
-    Name = "devops-catalog"
-  }
+  tags = local.tags
 }
 
 data "aws_availability_zones" "available" {
@@ -75,9 +72,5 @@ resource "aws_subnet" "worker" {
   cidr_block              = "10.0.${count.index}.0/24"
   vpc_id                  = aws_vpc.worker.id
   map_public_ip_on_launch = true
-  tags = {
-    "Name"                                      = "devops-catalog"
-    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
-  }
+  tags = local.tags
 }
-

@@ -2,7 +2,7 @@ resource "aws_eks_node_group" "primary" {
   cluster_name    = aws_eks_cluster.primary.name
   version         = var.k8s_version
   release_version = var.release_version
-  node_group_name = "devops-catalog"
+  node_group_name = "${local.tags.Service}-${local.Environment}-${var.cluster_name}-node-group-${local.region}-${local.env_tag.appenv}"
   node_role_arn   = aws_iam_role.worker.arn
   subnet_ids      = aws_subnet.worker[*].id
   instance_types  = [var.machine_type]
@@ -20,10 +20,11 @@ resource "aws_eks_node_group" "primary" {
     create = "15m"
     update = "1h"
   }
+  tags = local.tags
 }
 
 resource "aws_iam_role" "worker" {
-  name = "devops-catalog-worker"
+  name = "${local.tags.Service}-${local.Environment}-eks-worker-role"
   assume_role_policy = jsonencode({
     Statement = [{
       Action = "sts:AssumeRole"
@@ -34,6 +35,7 @@ resource "aws_iam_role" "worker" {
     }]
     Version = "2012-10-17"
   })
+  tags = local.tags
 }
 
 resource "aws_iam_role_policy_attachment" "worker" {
@@ -53,9 +55,7 @@ resource "aws_iam_role_policy_attachment" "registry" {
 
 resource "aws_internet_gateway" "worker" {
   vpc_id = aws_vpc.worker.id
-  tags = {
-    Name = "devops-catalog"
-  }
+  tags = local.tags
 }
 
 resource "aws_route_table" "worker" {
@@ -64,6 +64,7 @@ resource "aws_route_table" "worker" {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.worker.id
   }
+  tags = local.tags
 }
 
 resource "aws_route_table_association" "worker" {
