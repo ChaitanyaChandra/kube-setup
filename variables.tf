@@ -36,17 +36,17 @@ variable "release_version" {
 
 variable "min_node_count" {
   type    = number
-  default = 1
+  default = 2
 }
 
 variable "max_node_count" {
   type    = number
-  default = 2
+  default = 3
 }
 
 variable "machine_type" {
   type    = string
-  default = "t2.small"
+  default = "t3.xlarge"
 }
 
 variable "AWS_SECRET_ACCESS_KEY" {
